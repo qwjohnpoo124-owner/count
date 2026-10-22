@@ -93,7 +93,22 @@ main{min-width:0}
 .done{display:none;text-align:center;padding:24px;background:var(--card);border:1px solid var(--line);border-radius:12px}
 .done.show{display:block}
 .done .big{font-size:40px;font-weight:700;color:var(--accent)}
+
+.tocbtn{display:none}
+.drawer[hidden]{display:none}
+.drawer{position:fixed;inset:0;z-index:40}
+.dback{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.dpanel{position:absolute;top:0;left:0;bottom:0;width:min(86vw,340px);background:var(--card);overflow:auto;padding:12px 14px 40px;box-shadow:var(--shadow);font-size:15px}
+.dtitle{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:6px}
+.dpanel a{display:block;color:var(--mute);text-decoration:none;padding:8px 6px;line-height:1.4;border-bottom:1px solid var(--line)}
+.dpanel a.n2{font-weight:700;color:var(--ink);margin-top:10px;border-bottom:2px solid var(--accent)}
+.dpanel a.n3{padding-left:16px}
 @media (max-width:860px){
+  .tocbtn{display:inline-block}
+  .doc th{white-space:normal;min-width:4.5em}
+  .doc table{font-size:14px}
+  .doc th,.doc td{padding:7px 9px}
+  body{font-size:16px}
   .wrap{grid-template-columns:1fr;gap:0}
   aside{display:none}
   .doc h2{font-size:22px}
@@ -111,9 +126,36 @@ main{min-width:0}
       <button class="tab" role="tab" data-p="quiz" aria-selected="false">選擇題</button>
       <button class="tab" role="tab" data-p="calc" aria-selected="false">計算題</button>
     </nav>
+    <button class="icon tocbtn" id="tocbtn" title="目錄" aria-label="開啟目錄">☰</button>
     <button class="icon" id="theme" title="切換深色/淺色" aria-label="切換深色或淺色">◐</button>
   </div>
 </header>
+
+<div class="drawer" id="drawer" hidden><div class="dback" id="dback"></div><nav class="dpanel" id="dpanel"><div class="dtitle">目錄 <button class="icon" id="dclose" aria-label="關閉">✕</button></div><a class="n2" href="#s0" data-t="s0">0. 整門課在做什麼(先看這張地圖)</a>
+<a class="n2" href="#s1" data-t="s1">第一階段:描述統計</a>
+<a class="n3" href="#s2" data-t="s2">W2 四大變數(測量尺度)</a>
+<a class="n3" href="#s3" data-t="s3">W2 次數分配</a>
+<a class="n3" href="#s4" data-t="s4">W3 集中量數(資料的「中心」)</a>
+<a class="n3" href="#s5" data-t="s5">W3 變異量數(資料有多「分散」)</a>
+<a class="n3" href="#s6" data-t="s6">W3 相對地位量數(你在團體中的位置)</a>
+<a class="n3" href="#s7" data-t="s7">W4 二項分配 → 常態分配</a>
+<a class="n2" href="#s8" data-t="s8">第二階段:機率</a>
+<a class="n3" href="#s9" data-t="s9">W5 集合、機率、事件、期望值</a>
+<a class="n2" href="#s10" data-t="s10">第三階段:推論統計</a>
+<a class="n3" href="#s11" data-t="s11">W6 抽樣</a>
+<a class="n3" href="#s12" data-t="s12">W6 中央極限定理(整門課最重要的定理之一)</a>
+<a class="n3" href="#s13" data-t="s13">W7 抽樣分配與四大分配</a>
+<a class="n3" href="#s14" data-t="s14">W8 估計(一)</a>
+<a class="n3" href="#s15" data-t="s15">W9 估計(二):百分比與樣本數</a>
+<a class="n2" href="#s16" data-t="s16">第四階段:關係分析</a>
+<a class="n3" href="#s17" data-t="s17">W10 相關</a>
+<a class="n3" href="#s18" data-t="s18">W11 簡單直線迴歸</a>
+<a class="n3" href="#s19" data-t="s19">W12 多元迴歸與逐步迴歸</a>
+<a class="n3" href="#s20" data-t="s20">W13 卡方考驗(χ²)</a>
+<a class="n2" href="#s21" data-t="s21">速查:該用哪個分配/方法?</a>
+<a class="n2" href="#s22" data-t="s22">常考觀念陷阱(來自成果驗收題)</a>
+<a class="n2" href="#s23" data-t="s23">資料不完整的地方(請注意)</a>
+<a class="n2" href="#s24" data-t="s24">檔案位置(都在 D:\Desktop\數碩網頁\)</a></nav></div>
 
 <div class="wrap">
   <aside id="side"><nav><a class="n2" href="#s0" data-t="s0">0. 整門課在做什麼(先看這張地圖)</a>
@@ -848,6 +890,22 @@ build(false, false);
 /* ===== 計算題 ===== */
 document.getElementById('clist').innerHTML = CALC.map((c, i) =>
   `<details class="calc"><summary><span>${c.c}</span>${i+1}. ${c.q}</summary><div class="ans">${c.a}</div></details>`).join('');
+
+
+/* 手機目錄抽屜 */
+const drawer=document.getElementById('drawer');
+function openDrawer(){ showPanel('notes'); drawer.hidden=false; }
+function closeDrawer(){ drawer.hidden=true; }
+document.getElementById('tocbtn').onclick=openDrawer;
+document.getElementById('dback').onclick=closeDrawer;
+document.getElementById('dclose').onclick=closeDrawer;
+drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault(); closeDrawer();
+  const t=document.getElementById(a.dataset.t); if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+document.querySelectorAll('#side a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault(); const t=document.getElementById(a.dataset.t); if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+}));
 
 /* 以網址 hash 開啟分頁 */
 const h = location.hash.slice(1);
