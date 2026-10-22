@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>教育統計 學習網頁</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#1d2330; --mute:#5d6678; --line:#e2e6ee;
+  --accent:#2f5fd0; --accent-soft:#e8eefc; --ok:#1c7c4a; --ok-bg:#e4f5ec; --bad:#b3261e; --bad-bg:#fdeceb;
+  --warn-bg:#fff6dd; --code:#f0f2f7; --shadow:0 1px 2px rgba(20,30,60,.06),0 4px 14px rgba(20,30,60,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12151c; --card:#1b2029; --ink:#e7eaf1; --mute:#9aa3b5; --line:#2b3240;
+    --accent:#7aa2ff; --accent-soft:#222c44; --ok:#5fd08e; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#38201f;
+    --warn-bg:#3a3217; --code:#252b37; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12151c; --card:#1b2029; --ink:#e7eaf1; --mute:#9aa3b5; --line:#2b3240;
+  --accent:#7aa2ff; --accent-soft:#222c44; --ok:#5fd08e; --ok-bg:#16301f; --bad:#ff8a80; --bad-bg:#38201f;
+  --warn-bg:#3a3217; --code:#252b37; --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.75 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-weight:700;font-size:17px;margin-right:auto}
+.brand small{font-weight:400;color:var(--mute);margin-left:8px}
+.tabs{display:flex;gap:6px}
+.tab{border:1px solid var(--line);background:transparent;color:var(--ink);padding:6px 14px;border-radius:999px;
+  cursor:pointer;font:inherit;font-size:14px}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.icon{border:1px solid var(--line);background:transparent;color:var(--ink);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:15px}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 80px;display:grid;grid-template-columns:260px 1fr;gap:28px}
+aside{position:sticky;top:70px;align-self:start;max-height:calc(100vh - 90px);overflow:auto;padding-right:6px;font-size:14px}
+aside a{display:block;color:var(--mute);text-decoration:none;padding:3px 8px;border-left:2px solid transparent;line-height:1.45}
+aside a.n2{font-weight:700;color:var(--ink);margin-top:12px;border-left:none;padding-left:0}
+aside a.n3{margin-left:2px}
+aside a:hover{color:var(--accent)}
+aside a.on{color:var(--accent);border-left-color:var(--accent);background:var(--accent-soft)}
+main{min-width:0}
+.panel{display:none}.panel.show{display:block}
+/* 內容樣式 */
+.doc h2{font-size:26px;margin:44px 0 6px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+.doc h2:first-child{margin-top:0}
+.doc h3{font-size:20px;margin:30px 0 8px;padding:6px 12px;background:var(--accent-soft);border-radius:8px;color:var(--ink)}
+.doc p,.doc li{overflow-wrap:anywhere}
+.doc ul,.doc ol{padding-left:22px}
+.doc li{margin:3px 0}
+.doc blockquote{margin:14px 0;padding:10px 16px;background:var(--warn-bg);border-left:4px solid #e0a800;border-radius:6px;color:var(--ink)}
+.doc blockquote p{margin:4px 0}
+.doc strong{color:var(--ink)}
+.doc code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:.92em}
+.doc hr{border:none;border-top:1px solid var(--line);margin:30px 0}
+.tw{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);box-shadow:var(--shadow)}
+.doc table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.55}
+.doc th{background:var(--accent-soft);text-align:left;white-space:nowrap}
+.doc th,.doc td{padding:8px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.doc tr:last-child td{border-bottom:none}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:22px;box-shadow:var(--shadow)}
+.hero h1{margin:0 0 6px;font-size:26px}
+.hero p{margin:0;color:var(--mute)}
+/* 測驗 */
+.qhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.qhead select,.qhead button{font:inherit;font-size:14px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.qhead button.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.score{margin-left:auto;font-size:14px;color:var(--mute)}
+.score b{color:var(--ink);font-size:18px}
+.prog{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.q{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px;box-shadow:var(--shadow)}
+.q .tag{font-size:12px;color:var(--accent);font-weight:600}
+.q h4{margin:4px 0 10px;font-size:17px;line-height:1.6;font-weight:600}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:15.5px;line-height:1.5;color:var(--ink);background:transparent;
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:6px 0;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.exp{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;background:var(--code);font-size:14.5px}
+.exp.show{display:block}
+.exp b.r{color:var(--ok)}.exp b.w{color:var(--bad)}
+.calc{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;box-shadow:var(--shadow);overflow:hidden}
+.calc summary{cursor:pointer;padding:13px 16px;list-style:none;font-weight:600}
+.calc summary::-webkit-details-marker{display:none}
+.calc summary span{color:var(--accent);font-size:12px;margin-right:8px}
+.calc[open] summary{border-bottom:1px solid var(--line)}
+.calc .ans{padding:12px 16px;font-size:15px;background:var(--code)}
+.done{display:none;text-align:center;padding:24px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.done.show{display:block}
+.done .big{font-size:40px;font-weight:700;color:var(--accent)}
+@media (max-width:860px){
+  .wrap{grid-template-columns:1fr;gap:0}
+  aside{display:none}
+  .doc h2{font-size:22px}
+  .brand small{display:none}
+}
+@media print{header,aside,.tabs{display:none}.wrap{display:block}.panel{display:block!important}#quiz,#calc{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">教育統計 <small>重點整理 + 複習題</small></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-p="notes" aria-selected="true">重點整理</button>
+      <button class="tab" role="tab" data-p="quiz" aria-selected="false">選擇題</button>
+      <button class="tab" role="tab" data-p="calc" aria-selected="false">計算題</button>
+    </nav>
+    <button class="icon" id="theme" title="切換深色/淺色" aria-label="切換深色或淺色">◐</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside id="side"><nav><a class="n2" href="#s0" data-t="s0">0. 整門課在做什麼(先看這張地圖)</a>
+<a class="n2" href="#s1" data-t="s1">第一階段:描述統計</a>
+<a class="n3" href="#s2" data-t="s2">W2 四大變數(測量尺度)</a>
+<a class="n3" href="#s3" data-t="s3">W2 次數分配</a>
+<a class="n3" href="#s4" data-t="s4">W3 集中量數(資料的「中心」)</a>
+<a class="n3" href="#s5" data-t="s5">W3 變異量數(資料有多「分散」)</a>
+<a class="n3" href="#s6" data-t="s6">W3 相對地位量數(你在團體中的位置)</a>
+<a class="n3" href="#s7" data-t="s7">W4 二項分配 → 常態分配</a>
+<a class="n2" href="#s8" data-t="s8">第二階段:機率</a>
+<a class="n3" href="#s9" data-t="s9">W5 集合、機率、事件、期望值</a>
+<a class="n2" href="#s10" data-t="s10">第三階段:推論統計</a>
+<a class="n3" href="#s11" data-t="s11">W6 抽樣</a>
+<a class="n3" href="#s12" data-t="s12">W6 中央極限定理(整門課最重要的定理之一)</a>
+<a class="n3" href="#s13" data-t="s13">W7 抽樣分配與四大分配</a>
+<a class="n3" href="#s14" data-t="s14">W8 估計(一)</a>
+<a class="n3" href="#s15" data-t="s15">W9 估計(二):百分比與樣本數</a>
+<a class="n2" href="#s16" data-t="s16">第四階段:關係分析</a>
+<a class="n3" href="#s17" data-t="s17">W10 相關</a>
+<a class="n3" href="#s18" data-t="s18">W11 簡單直線迴歸</a>
+<a class="n3" href="#s19" data-t="s19">W12 多元迴歸與逐步迴歸</a>
+<a class="n3" href="#s20" data-t="s20">W13 卡方考驗(χ²)</a>
+<a class="n2" href="#s21" data-t="s21">速查:該用哪個分配/方法?</a>
+<a class="n2" href="#s22" data-t="s22">常考觀念陷阱(來自成果驗收題)</a>
+<a class="n2" href="#s23" data-t="s23">資料不完整的地方(請注意)</a>
+<a class="n2" href="#s24" data-t="s24">檔案位置(都在 D:\Desktop\數碩網頁\)</a></nav></aside>
+  <main>
+    <section id="notes" class="panel show">
+      <div class="hero">
+        <h1>教育統計 學習網頁</h1>
+        <p>整理自淡江 iClass「教育統計」課程的影片逐字稿與講義。上方切換到「選擇題」或「計算題」練習。</p>
+      </div>
+      <div class="doc"><blockquote>
+<p>資料來源:課程的 81 支影片(用語音辨識轉成逐字稿後閱讀)、約 50 份講義(PPT/Word)、四大變數比較表與課程單圖片。
+標「📝補充」的是講義公式為圖片、無法抽出時,我依標準統計寫法補上的內容,請與課本核對。
+本檔最後有「資料不完整的地方」清單。</p>
+</blockquote>
+<hr />
+<h2 id="s0">0. 整門課在做什麼(先看這張地圖)</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>階段</th>
+<th>週次</th>
+<th>核心問題</th>
+<th>關鍵詞</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 描述統計</td>
+<td>W2–W4</td>
+<td>一堆數字怎麼濃縮成幾個指標?</td>
+<td>四大變數、次數分配、平均數、標準差、Z 分數、常態分配</td>
+</tr>
+<tr>
+<td>② 機率</td>
+<td>W5</td>
+<td>不確定的事怎麼算可能性?</td>
+<td>集合、樣本空間、事件、期望值</td>
+</tr>
+<tr>
+<td>③ 推論統計</td>
+<td>W6–W9</td>
+<td>怎麼用小樣本猜大母體?</td>
+<td>抽樣、中央極限定理、Z/t/χ²/F、信賴區間</td>
+</tr>
+<tr>
+<td>④ 關係分析</td>
+<td>W10–W13</td>
+<td>變數之間有沒有關係、能不能預測?</td>
+<td>相關、直線迴歸、多元迴歸、卡方</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>週次註記:iClass 側欄把「直線迴歸」放 W11、「多元迴歸」放 W12、「卡方」放 W13;但課程單圖片寫 W12 簡單直線迴歸、W13 多元迴歸。內容一樣,只是編號差一週。</p>
+</blockquote>
+<hr />
+<h2 id="s1">第一階段:描述統計</h2>
+<h3 id="s2">W2 四大變數(測量尺度)</h3>
+<p>由低到高,「提供的訊息」越來越多(1951 年 Stevens 提出):</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th>名義</th>
+<th>次序</th>
+<th>等距</th>
+<th>比例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>能分類</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>能排大小順序</td>
+<td>✘</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>能加減(差距相等)</td>
+<td>✘</td>
+<td>✘</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>能乘除</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>有絕對零點</td>
+<td>✘</td>
+<td>✘</td>
+<td>✘</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>例子</td>
+<td>性別、宗教、血型、學號、背號</td>
+<td>名次、等第、教育程度、態度量表</td>
+<td>溫度、智商、測驗成績</td>
+<td>身高、體重、年齡、薪資、面積</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>名義</strong>:只有「次數」有意義(眾數可用),各類別互斥且完整。</li>
+<li><strong>次序</strong>:能排序,但「第一名和第二名差多少」不知道,所以不能做四則運算。</li>
+<li><strong>等距</strong>:要有「相等單位」(a&gt;b&gt;c 且 a−b=b−c)。眾數、中位數、平均數都有意義,可加減不可乘除(例如 20℃ 不是 10℃ 的兩倍)。</li>
+<li><strong>比例</strong>:多了絕對零點,所以可以說「兩倍」。等距和比例都屬於連續變數。</li>
+<li>課程的比較表把統計量也分了類:眾數 → 名義;中位數、百分等級、四分位差、積差相關 → 次序;平均數、標準差、標準分數、全距 → 等距。</li>
+</ul>
+<h3 id="s3">W2 次數分配</h3>
+<ul>
+<li>次數分配表(次數表)= 把蒐集到的資料整理成表。</li>
+<li>📝補充 製表步驟:找最大值與最小值 → 算全距 → 決定組數與組距 → 設定各組上下限 → 劃記 → 統計次數(可再算相對次數、累積次數)。這段影片檔下載不完整,上面是通用步驟。</li>
+<li>選圖原則(依資料類型):</li>
+<li>類別資料(名義):<strong>長條圖</strong>(長方形要分開,因為資料沒有連續性)、<strong>圓形圖</strong>(容易看比例,缺點是看不出原始數字)。</li>
+<li>連續資料:<strong>直方圖</strong>(用面積表示數量,長方形相連)、次數多邊形圖、累加次數曲線圖。</li>
+</ul>
+<h3 id="s4">W3 集中量數(資料的「中心」)</h3>
+<p>以 12 位學生成績 40,40,50,50,60,60,70,70,70,80,80,90 為例:</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>量數</th>
+<th>做法</th>
+<th>例子結果</th>
+<th>備註</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>平均數</td>
+<td>全部加總 ÷ 個數</td>
+<td>760 ÷ 12 = <strong>63.3</strong></td>
+<td>受極端值影響大;分樣本平均與母體平均</td>
+</tr>
+<tr>
+<td>中位數</td>
+<td>排序後中間那個</td>
+<td>N=12 為偶數,取第 6、7 個平均:(60+70)÷2 = <strong>65</strong></td>
+<td>N 奇數:第 (N+1)/2 個;偶數:第 N/2 與 N/2+1 個的平均。有 50% 資料高於、50% 低於它</td>
+</tr>
+<tr>
+<td>眾數</td>
+<td>出現最多次</td>
+<td><strong>70</strong>(3 人)</td>
+<td>適用所有尺度;分配很平均或眾數很多時失去意義</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s5">W3 變異量數(資料有多「分散」)</h3>
+<p>數值越大代表越分散。</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>量數</th>
+<th>意思</th>
+<th>重點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全距 R</td>
+<td>最大 − 最小</td>
+<td>例:身高最大 185、最小 163,R = 22</td>
+</tr>
+<tr>
+<td>四分位差 QD</td>
+<td>Q3 − Q1(中間 50% 資料的範圍)</td>
+<td>Q1 位置 = (n+1)/4,Q3 位置 = 3(n+1)/4。例:年齡 18~24 七人,Q1=19、Q3=23,QD=4,表示 50% 的人集中在 19–23 歲</td>
+</tr>
+<tr>
+<td>平均差 AD</td>
+<td>各數離平均的「絕對距離」的平均</td>
+<td>離均差總和必為 0,所以要取絕對值才能加總</td>
+</tr>
+<tr>
+<td>變異數</td>
+<td>離均差平方的平均</td>
+<td>📝補充 σ² = Σ(X−μ)²/N</td>
+</tr>
+<tr>
+<td>標準差 SD</td>
+<td>變異數開根號</td>
+<td>必為非負;單位和原資料相同;越大越分散,越小越靠近平均</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="s6">W3 相對地位量數(你在團體中的位置)</h3>
+<ul>
+<li><strong>百分等級 PR</strong>:有多少 % 的人比你低。</li>
+<li>由分數算:PR = (100/N) × 贏過的人數 + (100/N) × ½(加半個等級代表本人)。</li>
+<li>由名次算:PR = 100 − (100R − 50)/N。</li>
+<li><strong>百分位數 Pk</strong>:反過來,第 k 百分位對應的「真實分數」。</li>
+<li><strong>Z 分數(標準分數)</strong>:Z = (X − 平均) ÷ 標準差,表示離平均幾個標準差。標準化的過程叫「標準化」。</li>
+</ul>
+<h3 id="s7">W4 二項分配 → 常態分配</h3>
+<p><strong>二項分配</strong>(白努力試驗重複 n 次):每次只有「成功(機率 p)/失敗(機率 q=1−p)」。
+- 機率:P(X=r) = C(n,r) pʳ qⁿ⁻ʳ,係數可用帕斯卡三角形看。
+- <strong>平均數 μ = np,變異數 σ² = npq</strong>。
+- 例:投手好球機率 0.6,投 100 球 → 期望值 60、變異數 24。
+- 例:10 顆球有 2 顆不良品,抽後放回抽 3 次,X=不良品個數,P(X=k)=C(3,k)(0.2)ᵏ(0.8)³⁻ᵏ。
+- 二項分配是間斷的;n 越大、p=q=½ 時,它越來越像常態分配(連續)。</p>
+<p><strong>常態分配</strong>(高斯分配)的特性:
+1. 鐘形、左右對稱,平均數 = 中位數 = 眾數,位於最高點。
+2. 曲線漸近橫軸但永不相交,總面積 = 1。
+3. μ 改變 → 曲線左右平移;σ 改變 → 形狀變胖或變瘦。
+4. <strong>經驗法則</strong>:μ±1σ 約 68.26%,μ±2σ 約 95.44%,μ±3σ 約 99.74%。
+5. 標準常態:Z ~ N(0,1);最高點 y = 0.3989;反曲點在 Z=±1。
+6. 📝補充 四分位差在常態下稱機誤:PE = 0.6745σ。</p>
+<p>查表例(成果驗收):μ=100、σ=20,某生 137 分 → Z = 1.85 → 面積 0.4678 → 0.5+0.4678 ≈ 96.8%,約 97% 的人不如他。
+另一題:平均上 1 個標準差,約在第 84 百分位(50% + 34%)。</p>
+<p><strong>偏態與峰度</strong>(用動差):
+| | 係數 | =0 | &gt;0 | &lt;0 |
+|---|---|---|---|---|
+| 偏態 g1 | 三級動差,Z 分數三次方的平均 | 對稱(常態) | <strong>正偏(右偏)</strong>:尾巴在右,低分多,平均數 &gt; 中位數 | <strong>負偏(左偏)</strong>:高分多,平均數 &lt; 中位數 |
+| 峰度 g2 | 四級動差,Z 分數四次方的平均 −3 | 常態峰 | <strong>高狹峰</strong>(比常態尖瘦,兩端極端值多) | <strong>低闊峰</strong>(比常態平寬) |</p>
+<p><strong>常態化標準分數(Z 的各種「變身」)</strong>——目的是消除小數與負數,讓不同測驗能比較:
+| 種類 | 公式 | 平均 / 標準差 |
+|---|---|---|
+| Z 分數 | (X−μ)/σ | 0 / 1 |
+| <strong>T 分數</strong> | <strong>T = 10Z + 50</strong> | 50 / 10 |
+| 比西(BSS) | 16Z + 100 | 100 / 16 |
+| 魏氏(WISC) | 15Z + 100 | 100 / 15 |
+| AGCT | 20Z + 100 | 100 / 20 |
+| 另有標準 9 分、標準 10 分、C 量表 | | |</p>
+<ul>
+<li>T 分數例:甲在 A 考場 80 分(平均 78、SD 4)→ T = 50 + 10×(80−78)/4 = <strong>55</strong>;乙在 B 考場 90 分(平均 87、SD 9)→ T = 50 + 10×(90−87)/9 = <strong>53.3</strong>。甲較高。用途:同一場考試不同考場、評審寬嚴不同時做校正。</li>
+<li>T 分數的前提是母群體為常態;μ±5σ 內 T 為 0–100,實務上多落在 15–85。</li>
+<li>百分等級是<strong>次序</strong>量尺(永遠為正),標準分數是<strong>等距</strong>量尺(可為負)。</li>
+<li>要換算不同量表,都先轉成 Z 分數。</li>
+</ul>
+<hr />
+<h2 id="s8">第二階段:機率</h2>
+<h3 id="s9">W5 集合、機率、事件、期望值</h3>
+<p><strong>集合</strong>:元素、子集合、空集合(ψ)。
+- 運算:<strong>聯集 ∪</strong>(兩集合所有元素,重複只算一次)、<strong>交集 ∩</strong>(共同元素)、<strong>補集/差集</strong>、對稱差集。
+- 運算律:交換律、結合律、分配律、冪等律、對偶律(笛摩根)。</p>
+<p><strong>機率</strong>(0 到 1 的數):
+- 三種定義:古典(等可能)、統計/頻率(重複試驗的相對次數)、主觀(個人相信程度)。
+- P(A) = 事件的樣本點數 ÷ 樣本空間的樣本點數。
+- <strong>樣本空間 U</strong>:所有可能結果的集合(擲骰子:{1,2,3,4,5,6});其中每個結果是<strong>樣本點</strong>。
+- <strong>事件</strong>:樣本空間的任一子集合。必然事件(= 全空間)、不可能事件(= 空集合)。
+- 事件分類:
+  - <strong>簡單事件</strong>(基本事件):只含 1 個樣本點(擲出 1 點)。
+  - <strong>複合/複雜事件</strong>:含 2 個以上樣本點(擲出奇數 {1,3,5})。</p>
+<p><strong>機率公式</strong>(講義整理):
+| 情形 | 公式 | 例子 |
+|---|---|---|
+| 互斥(交集為空) | P(A∪B) = P(A)+P(B) | 抽到鬼牌或黑桃 2:¼+¼ = ½ |
+| 非互斥 | P(A∪B) = P(A)+P(B) − P(A∩B) | 抽到黑桃或 2:½+½−¼ = ¾ |
+| 獨立事件 | P(A∩B) = P(A)×P(B) | 猜拳連贏 3 次:(⅓)³ = 1/27 |
+| 相依事件 | P(A∩B) = P(A)×P(B|A) | 3 黑 4 白不放回,連抽 2 白:4/7×3/6 = 2/7 |</p>
+<p><strong>期望值</strong> E(X) = ΣPᵢXᵢ(長期重複實驗的平均,也就是母體平均數 μ)。
+- 抽獎例:10 球中紅 5 球得 10 元、黃 3 球得 100 元、藍 2 球得 200 元 → E = 5/10×10 + 3/10×100 + 2/10×200 = <strong>75 元</strong>。
+- 擲 3 枚硬幣,X=反面數:E = 0×⅛+1×⅜+2×⅜+3×⅛ = <strong>1.5</strong>。
+- 賭局:期望值為正對玩家有利,為負則越玩越虧。
+- 變異數:E[(X−μ)²] = σ²,即「無限次重複取樣得到的 s² 平均就是母體變異數」。
+- 成果驗收題型:統一發票獎金期望值(特獎 200 萬…六獎 200 元,合計約 1.3024 元/張);若公益團體用 50 元贈品換 50 張未對獎的發票,預期獎金約 65 元 &gt; 50 元,所以<strong>划算</strong>。</p>
+<hr />
+<h2 id="s10">第三階段:推論統計</h2>
+<h3 id="s11">W6 抽樣</h3>
+<p>為什麼抽樣?<strong>普查</strong>耗時、成本高、難蒐集深入資訊、出錯機率也大,所以抽一部分樣本去推估母體。</p>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>做法</th>
+<th>重點</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>簡單隨機</strong></td>
+<td>每個個體機會均等(抽籤、亂數表)</td>
+<td>兩原則:<strong>均等機率</strong>、<strong>獨立</strong>。分<strong>投返式(還原)</strong>與<strong>不投返式(不還原)</strong></td>
+</tr>
+<tr>
+<td><strong>分層隨機</strong></td>
+<td>先把母體分層(例:一~四年級),每層再隨機抽</td>
+<td>樣本相同時比簡單隨機更可靠、能比較各層;<strong>分層不當就失效</strong>。配置法:比例配置(依層大小)、標準差配置(標準差大 → 樣本多)、Neyman 配置(兩者併用)</td>
+</tr>
+<tr>
+<td><strong>集群(叢式)</strong></td>
+<td>先分成自然集群,抽「整個集群」當樣本</td>
+<td>優點:無限母體也能抽、就近調查省時省錢。例:12 個行政區抽 6 區,再抽一條路普查全部住戶</td>
+</tr>
+<tr>
+<td><strong>系統</strong></td>
+<td>排好順序,每隔 k 個抽 1 個,k = N/n</td>
+<td>起點在第一區間內隨機抽。例:母體 5000、抽 50 → k=100,起點抽到 30 → 30, 130, 230, … , 4930</td>
+</tr>
+</tbody>
+</table></div>
+<p>分層 vs 集群:分層是「每一層都抽」,層內相同、層間不同;集群是「抽幾個集群全部調查」。</p>
+<h3 id="s12">W6 中央極限定理(整門課最重要的定理之一)</h3>
+<ul>
+<li>從<strong>任何分配</strong>的母體,用樣本數 n 夠大(一般 n ≥ 30)重複抽樣,<strong>樣本平均數的分配會趨近常態</strong>。</li>
+<li>樣本平均數的平均數 = 母體平均數 μ。</li>
+<li>樣本平均數的標準差(<strong>標準誤 SE</strong>)= σ/√n,比原來的 σ 小。n 越大越集中。</li>
+<li>骰子例:原本是均等分配(非常態),只要擲 2 次取平均,平均數的分配就開始像鐘形。</li>
+<li>相關:<strong>大數法則</strong>——樣本越大,樣本平均越接近母體平均。</li>
+</ul>
+<h3 id="s13">W7 抽樣分配與四大分配</h3>
+<ul>
+<li><strong>抽樣分配</strong>:從母體反覆抽樣,每組算出一個統計量(如平均數),這些統計量形成的分配。</li>
+<li>名詞:<strong>參數</strong>(母體的數,如 μ、σ)vs <strong>統計量</strong>(樣本的數);<strong>估計量</strong>(用來估計的公式 X̄)vs <strong>估計值</strong>(代入實際資料得到的數)。</li>
+<li><strong>抽樣誤差</strong>(來自機遇,可用 SE 衡量)vs <strong>非抽樣誤差</strong>(調查執行、記錄整理的錯誤)。</li>
+<li>影響抽樣分配的因素:母體大小、樣本大小、統計量。</li>
+</ul>
+<p>四大分配:
+| 分配 | 怎麼來 | 形狀特性 | 用途 |
+|---|---|---|---|
+| <strong>Z(常態)</strong> | 樣本平均數轉成 Z | 平均 0、標準差 1,對稱鐘形 | 母體標準差已知,或大樣本 |
+| <strong>t</strong> | Z 除以 √(χ²/自由度) | 對稱鐘形、比 Z 扁平、尾巴較厚;<strong>df 越大越像常態,df=∞ 時就是常態</strong>;df≈30 已很接近;df=1 時 t²=F | 母體標準差<strong>未知</strong>;比較平均數 |
+| <strong>χ²(卡方)</strong> | n 個 Z 平方後加總 | 右偏、值 ≥ 0;平均 = df;<strong>可加性</strong>:df 相加;df 越大越像常態 | 母體變異數估計/檢定;類別資料(適合度、獨立性、百分比同質性、改變顯著性) |
+| <strong>F</strong> | 兩個卡方的比值 | 右偏、值 ≥ 0;有兩個自由度(分子、分母);1/F 也是 F(自由度互換);t² 是 F(1, n−1) | 比較兩母體變異數是否相等 |</p>
+<ul>
+<li>t 與 Z 比較:t 較扁平、極端值多,所以同一顯著水準下 <strong>t 的臨界值較大,較難顯著</strong>;n&gt;30 時兩者臨界值接近。</li>
+<li>三者(Z、t、F)皆為連續分配,皆源自常態母體。</li>
+</ul>
+<hr />
+<h3 id="s14">W8 估計(一)</h3>
+<p><strong>估計 = 用樣本統計量去推測母體參數。</strong>
+- <strong>點估計</strong>:給一個數字(民調 42%)。
+- <strong>區間估計</strong>:給一個範圍,這個範圍叫<strong>信賴區間</strong>,兩端是下、上信賴界限;<strong>信賴水準 = 1−α</strong>(95%、99%…)。</p>
+<p><strong>好的點估計量有四個準則</strong>:
+1. <strong>不偏性</strong>:E(θ̂) = θ(樣本平均數是 μ 的不偏估計量)。
+2. <strong>有效性</strong>:所有不偏估計量中,<strong>變異數最小</strong>者。
+3. <strong>一致性</strong>:n 越大,越接近母數。
+4. <strong>充分性</strong>:能從樣本中提供最多關於母數的訊息。</p>
+<p><strong>虛無假設 H₀ 與對立假設 H₁</strong>:
+- H₀:「沒有差異、沒有影響、沒有關係」(不希望成立的敘述,例:多運動不能減重),我們想<strong>推翻</strong>它。
+- H₁:研究者希望成立的敘述(例:多運動可以減重);推翻 H₀ 就等於支持 H₁。
+- <strong>型 I 錯誤(α)</strong>:H₀ 為真卻拒絕它(又稱顯著水準的風險)。
+- <strong>型 II 錯誤(β)</strong>:H₀ 為假卻沒拒絕它。
+- 教育心理常用 α = .05 或 .01。</p>
+<p><strong>影響信賴區間寬度的四個因素</strong>:
+| 因素 | 影響 |
+|---|---|
+| ① 點估計量的種類 | 只影響區間<strong>位置</strong>,不影響長度 |
+| ② 樣本大小 n | n 大 → 區間<strong>短</strong>(精準) |
+| ③ 信賴係數 1−α | 1−α 越大 → Z 越大 → 區間<strong>越長</strong>(精確度反而下降) |
+| ④ 單尾 / 雙尾 | <strong>雙尾</strong>(「是否不同、有無差異」);<strong>單尾</strong>(「大於、小於、高於、優於」) |</p>
+<p>另一個等價說法(誤差大小):樣本越大誤差越小(反比)、母體標準差越大誤差越大(正比)、臨界值越大誤差越大。</p>
+<p><strong>區間估計的類型</strong>:平均數、變異數、比例(百分比)、相關係數。
+1. <strong>平均數</strong>:樣本統計量 ± 臨界值 × 標準誤。
+   - 母體常態、大樣本(n≥30)或 σ 已知 → <strong>Z</strong>。
+   - 母體常態、小樣本、σ 未知(用 s 取代)→ <strong>t</strong>(df = n−1)。
+   - 例(σ 已知):畢業生薪資 σ=2000、n=25、X̄=19,500 → 19,500 ± 1.96×(2000/√25) = 19,500 ± 784 → <strong>18,716 ~ 20,284</strong>。
+   - 例:WAIS 智商 n=100、X̄=110、σ=15 → 110 ± 1.96×1.5 → <strong>107.06 ~ 112.94</strong>。
+   - 例:投手 30 球,平均 116.5、SD 9.975 → 區間 <strong>112.78 ~ 120.22</strong>(這裡用的是 t 臨界值 2.045)。
+   - 例:σ=15、n=25、X̄=110,95% → 110 ± 1.96×3 ≈ <strong>104 ~ 116</strong>。
+2. <strong>獨立樣本 vs 相依樣本</strong>:
+   - <strong>獨立樣本</strong>(受試者間設計、等組法):兩組互不影響,組間相關為 0。例:男生智商 vs 女生智商;一班分兩組各用不同教學法。
+   - <strong>相依樣本</strong>(受試者內設計、單一組法):同一批人前後測,或配對。<strong>重複量數</strong>(同一群人測 K 次)與<strong>配對組法</strong>(配對成特質相同)。例:同一班期中考 vs 期末考。
+   - 兩母體平均差用哪個分配?
+     - σ₁、σ₂ 已知 → Z(不論樣本大小)。
+     - σ 未知、n₁,n₂ ≥ 30 → Z(用 S² 取代 σ²)。
+     - σ 未知、小樣本 → <strong>t</strong>:先判斷是否成對;若非成對,再判斷 σ₁²=σ₂² 與否(相等用合併變異數,df=n₁+n₂−2;不等用近似 df)。
+   - t 檢定三個<strong>基本假設</strong>:<strong>變異數同質性</strong>、<strong>常態分配</strong>、<strong>獨立性</strong>。
+   - 📝補充 這一段的考驗公式表在講義是圖片(考驗公式.doc),結構如上。
+3. <strong>變異數</strong>:樣本變異數服從<strong>卡方分配</strong>,是右偏<strong>非對稱</strong>分配,所以<strong>不能用「± 誤差」的方式</strong>,要用卡方查表。
+   - 目的①:兩母體平均差檢定前,要先確認變異數同質;②:想了解單一或兩群的分散程度。
+   - 例:n=20、s²=0.0025、df=19 → σ² 的 95% 信賴區間 <strong>0.0014 &lt; σ² &lt; 0.0053</strong>(開根號得 σ 約 0.037~0.073)。
+   - 另有「兩母體變異數比」的區間估計(用 F)。
+4. <strong>相關係數</strong>:r 的分配不對稱,要先做<strong>費雪 Z 轉換</strong>,在 Z 上做區間,<strong>最後要轉回 r</strong>。</p>
+<h3 id="s15">W9 估計(二):百分比與樣本數</h3>
+<p><strong>百分比(比例)區間估計</strong>:
+- 百分比的抽樣分配是二項分配;大樣本時近似常態 → 用 Z。
+- 使用條件:n ≥ 30,且 n·p̂、n·(1−p̂) 都 &gt; 5。
+- 標準誤 s_p = √(p̂(1−p̂)/n);區間 = p̂ ± Z × s_p。
+- 資料類型:連續變數 → 可算平均數;<strong>類別變數</strong>(二分、多點)→ 只能算次數與百分比。p 與 q 是以<strong>每個選項個別</strong>為基礎(選或不選),不是整體。
+- 例:電話訪問 1000 位成人,40% 贊成離島設賭場 → 95% 區間 <strong>37%~43%</strong>(抽樣誤差 ±3 個百分點)。
+- 例:攔截率 28/40 = 0.7;市占率 16% vs 7%(各 400 人,99%)——為成果驗收題。</p>
+<p><strong>樣本大小怎麼決定?</strong>
+- 要看:容許的 α、想要的精確度、對母數的最合理猜測。
+- 推估比例所需 n:n = Z²·p(1−p)/e²;p 未知時取最保守的 p=0.5(p(1−p) 最大為 ¼)。
+- 例:95%、誤差 ±3% → <strong>n ≈ 1067</strong>。
+- 速記表(95%、p=0.5):±10% → 約 100;±7% → 200;±5% → 400;±3% → 1000;±2% → 2400;±1% → 9600。
+- 推估平均數所需 n:📝補充 n = (Zσ/e)²。
+- 此推論以簡單隨機抽樣為前提。</p>
+<p><strong>期中案例影片</strong>:校長要學生畢業發展報告,不能只貼原始資料,要有平均數、次數分配、圖表等統計整理——點出「為什麼要學統計」。</p>
+<p>成果驗收答案要點:
+- 小樣本 t 檢定若母群不常態 → <strong>增加樣本人數</strong>(靠中央極限定理)。
+- 信賴區間越大 → 信心水準越高(但精確度越低);區間估計與點估計相比,點估計只用單次抽樣,所以不可靠。
+- 酒瓶題:廠商宣稱容積 500 cc、變異數 ≤ 3;樣本 25 瓶,平均 495、變異數 5。算出平均數與變異數的 95% 信賴區間後,若<strong>不包含</strong>宣稱值,就<strong>不接受</strong>廠商宣稱。</p>
+<hr />
+<h2 id="s16">第四階段:關係分析</h2>
+<h3 id="s17">W10 相關</h3>
+<p><strong>相關分析</strong>看「兩個變數的變動方向與程度」。</p>
+<ul>
+<li><strong>線性關係</strong>:兩變數像一條直線一起變。直線方程式 Y = bX + a,b 是斜率(X 每變動 1 單位,Y 變動多少)。</li>
+<li><strong>五種情形</strong>:完全正相關、正相關、零相關、負相關、完全負相關(看散佈圖:左下→右上為正,左上→右下為負;點越貼近直線關係越強;完全相關時點全在同一直線上)。</li>
+<li><strong>範圍</strong> −1 ≤ r ≤ +1,沒有單位,可跨樣本比較。</li>
+<li><strong>強度</strong>(課程判斷):|r| = 0.7–0.99 高度、0.4–0.69 中度、0.1–0.39 低度、&lt;0.1 微弱或無。(另一份複習講義的分法略有不同:0.1–0.3 低、0.5–0.7 中、0.8–1.0 高,考前請以老師說法為準。)</li>
+<li><strong>相關係數代表的是「緊密程度」,不是斜率。</strong></li>
+<li>r = +0.85 和 r = −0.85 <strong>關係一樣密切</strong>,只是方向不同;不能說正相關大於負相關。</li>
+<li><strong>相關不等於因果</strong>,原因:①有第三共同因素 ②可逆(誰是因誰是果) ③只是間接關係。</li>
+<li>r 要經 <strong>t 檢定</strong>才知道有沒有統計意義,<strong>df = N − 2</strong>(H₀:ρ = 0)。<strong>樣本很小時高 r 也可能是機遇;樣本很大時小 r 也不能忽視。</strong></li>
+<li>r = 0 有兩種意義:零相關,或是曲線相關。</li>
+<li><strong>皮爾遜積差相關</strong>:兩變數都是等距/比例變數;r = Σ(Zx·Zy)/N(Z 分數乘積的平均)。</li>
+<li><strong>點二系列相關 r_pb</strong>:一個變數是二分(男/女)、一個是連續;二分變數視為 0/1 時,算出來就等於 Pearson r;p、q 越接近 0.5,r_pb 才可能接近 1。</li>
+<li><strong>變異數 vs 共變數</strong>:變異數 = 離均差<strong>平方</strong>和 ÷ N(自己乘自己),描述一個變數的分散;共變數 = 離均差<strong>交乘積</strong>和 ÷ N(兩變數交乘),描述一起變的程度;<strong>r = 共變數 ÷ (SDx·SDy)</strong>;共變數為正/負/0,r 就為正/負/0。</li>
+</ul>
+<h3 id="s18">W11 簡單直線迴歸</h3>
+<ul>
+<li>相關看「有沒有關係」,<strong>迴歸用 X 預測 Y</strong>。X 叫<strong>預測變項(自變項)</strong>,Y 叫<strong>效標變項(依變項)</strong>。</li>
+<li><strong>兩變項要有顯著相關才能預測</strong>,無關聯的兩變項無法預測。</li>
+<li>迴歸分類:一個自變數 = 簡單迴歸;多個自變數 = 複迴歸(多元迴歸)。</li>
+<li><strong>最小平方法</strong>:找一條直線使各點到直線的<strong>垂直距離平方和最小</strong>,這條線叫最適合線 / 迴歸線。</li>
+<li>三種迴歸方程式:
+  | 資料形式 | 方程式 | 備註 |
+  |---|---|---|
+  | 原始分數 | Ŷ = a + bX | a 截距、b 斜率;實務預測用 |
+  | 離均差分數 | ŷ = b·x | 原點移到平均數,截距消失 |
+  | 標準分數 | Ẑy = β·Zx | β 為標準化迴歸係數;<strong>多個預測變項要比較誰重要,要用它</strong>(單位不同,不能比原始 b) |</li>
+<li><strong>四個基本假設</strong>:①<strong>等分散性</strong>(變異數同質;不論 X 多少,估計標準誤都相同)②依變項為<strong>常態分配</strong> ③預測關係是<strong>直線</strong> ④不同 X 下的 Y <strong>互相獨立</strong>。</li>
+<li>迴歸分析的用途:<strong>描述</strong>(節目製作費 vs 收視率)、<strong>控制</strong>(控制價格以控制需求量)、<strong>預測</strong>。</li>
+<li>課程活動:「統計網路學習館」(estat.ncku.edu.tw)動態線性迴歸,觀察新增資料點時迴歸線的變化。</li>
+</ul>
+<h3 id="s19">W12 多元迴歸與逐步迴歸</h3>
+<p><strong>變異的拆解</strong>(SS 公式):
+| 符號 | 意思 | 公式 | 別名 |
+|---|---|---|---|
+| <strong>SSt</strong> | 總變異(只猜平均數 Ȳ 的誤差) | Σ(Y − Ȳ)² | 總離均差平方和 |
+| <strong>SSreg</strong> | 被迴歸解釋的變異 | Σ(Ŷ − Ȳ)² | 迴歸離差平方和、被解釋變異 |
+| <strong>SSres</strong> | 殘差(預測仍猜錯的部分) | Σ(Y − Ŷ)² | 殘差平方和、未被解釋變異 |</p>
+<ul>
+<li><strong>SSt = SSreg + SSres</strong>;<strong>R² = SSreg / SSt</strong>(決定係數,預測變項解釋了多少 % 的變異)。</li>
+<li>迴歸係數是令 SSres <strong>最小</strong>求出來的。</li>
+</ul>
+<p><strong>多元(複)迴歸</strong>:預測變項 ≥ 2 個,Ŷ = a + b₁X₁ + b₂X₂ + …
+- <strong>多元相關 R</strong> = Y 與預測值 Ŷ 的相關。Ŷ 越接近 Y,預測越準。
+- 解決的問題:能否找出線性組合說明關係?關係強度?是否顯著?<strong>哪些預測變項最重要、能否減少變項數</strong>?
+- b₁ 的意思:<strong>固定 X₂ 時</strong>,X₁ 對 Y 的斜率。
+- 計算實例:Y=大學入學考、X₁=高中學業成績、X₂=智力測驗。r_y1=.643、r_y2=.768、r_12=.598 → 標準化 β₁=.286、β₂=.597(智力測驗比學業成績重要);R²=.6424(解釋 64.24%)、R=.8015。轉回原始分數:Ŷ = 0.391X₁ + 1.061X₂ − 2.140;某生 X₁=14、X₂=9 → <strong>Ŷ = 12.88</strong>。
+- <strong>注意</strong>:原始 b 不能直接比大小(單位不同),<strong>不能因 1.061 &gt; 0.391 就說 X₂ 較有預測力</strong>;要比重要性請看標準化 β。
+- <strong>估計標準誤</strong>:SEest = √(SSres/df) = √MS_res。例:SS_res=33.4711、df=7、MS=4.7816 → SEest ≈ 2.19;預測值 95% 信賴區間 = 12.88 ± 2.365 × SEest(t 的 df=7),約 <strong>7.70 ~ 18.06</strong>。</p>
+<p><strong>選預測變項的方法</strong>:
+- 同時迴歸:所有預測變項一起投入,只估係數,不負責篩選。
+- <strong>逐步迴歸</strong>:從許多候選變項中挑出少數有預測力的。
+  - <strong>順向選擇</strong>:每次選與 Y 相關最大(後續為偏相關平方最大)的變項進入,看 R² 增加多少。
+  - <strong>逐步法 = 順向選擇的改良</strong>:每步一個進入,但已進入的變項<strong>會被重新檢驗</strong>,若因新變項進來而不再顯著,<strong>會被剔除</strong>。
+  - 用途:選擇/剔除變項、評估變項重要性。
+  - SPSS 預設標準:進入 F 顯著性機率 ≤ .05;移除 ≥ .10。</p>
+<p><strong>SPSS 操作要點</strong>:
+- <strong>虛擬變數</strong>:間斷(類別)變項要轉成 0/1 才能投入迴歸;<strong>虛擬變數個數 = 水準數 − 1</strong>。
+  - 二分(性別):1 個(1=女、0=男)。
+  - 三分(家庭狀況):2 個(單親 1,0;他人照顧 0,1;雙親 0,0)。
+  - 四分(北中南東):3 個。
+- 操作:轉換 → 重新編碼成同一變數;分析 → 迴歸 → 線性;把效標變項放「依變數」、預測變項放「自變數」;選統計量(估計值、模式適合度、共線性診斷)。
+- 讀報表:模式摘要(R、R²、調整後 R²、估計標準誤)、ANOVA(P&lt;.01 代表模式顯著)、係數表(B=原始係數、β=標準化係數、各係數的 t 檢定)。
+- 講義例:用「性別、壓力懼怕、課堂焦慮、學習信心…」等 11 個預測變項預測「數學成就」。</p>
+<h3 id="s20">W13 卡方考驗(χ²)</h3>
+<p><strong>用途</strong>:處理<strong>類別資料</strong>(名義、次序),比較「<strong>觀察次數 O</strong>」與「<strong>期望次數 E</strong>」差多遠。
+<strong>公式</strong>:χ² = Σ (O − E)² / E。差距越大 → χ² 越大 → 越容易落入拒絕區。通常只做<strong>單尾(右尾)</strong>。
+<strong>注意事項</strong>:只適用類別資料;<strong>各格期望次數最好 ≥ 5</strong>(至少 80% 的格子 ≥ 5),不夠要合併;可視為無母數統計。</p>
+<p><strong>四種卡方考驗</strong>:
+| 考驗 | 問題 | H₀ | 自由度 |
+|---|---|---|---|
+| <strong>適合度</strong> | 觀察次數與理論分配是否相符? | O 與 E 無差異 | k − 1 |
+| <strong>百分比同質性</strong> | J 個群體在某選項的百分比是否相同? | 各群百分比相同 | (I−1)(J−1) |
+| <strong>獨立性</strong> | 兩個變項是否有關? | 兩變項獨立 | (I−1)(J−1) |
+| <strong>改變的顯著性</strong> | 同一批人前後測反應有沒有改變?(重複量數) | 前後無顯著改變(A=D) | 1 |</p>
+<ul>
+<li>期望次數:適合度用理論機率 × N;列聯表用 (列總和 × 行總和)/總人數;若各格相等就是 N/k。</li>
+<li><strong>同質性 vs 獨立性</strong>:都用列聯表;<strong>同質性事先固定各群人數</strong>(邊際固定,J 個群體);<strong>獨立性事先只固定總人數</strong>(兩個變項都沒固定)。同質性有「設計變項」(群體)與「反應變項」。</li>
+<li>範例結果:</li>
+<li><strong>同質性</strong>:高一 42、高二 46、高三 37 人調查是否讀過武俠小說,「有」的比例 64.3%、73.9%、75.7%,整體 71.2%;χ² = 1.51 &lt; 臨界值 5.991(df=2)→ <strong>接受 H₀,三年級百分比相同</strong>。</li>
+<li><strong>獨立性</strong>:100 位小學生「左右腦型」 × 「左右手利」,χ² = 15.13 &gt; 6.635(α=.01、df=1)→ <strong>拒絕 H₀,兩者有關</strong>。</li>
+<li><strong>改變</strong>:80 位學生學期初/末是否喜歡美術課,檢定結果 A=D(喜歡→不喜歡的人數 ≈ 不喜歡→喜歡的人數)→ 接受 H₀,<strong>無顯著改變</strong>。📝補充 常見公式 χ² = (A − D)²/(A + D),只看「改變」的人。</li>
+<li><strong>適合度</strong>(圖書館課外讀物):200 人,財經 55、電腦 25、小說 30、科學 50、傳記 40;期望各 40 → 📝我算出 χ² = 16.25(df=4、臨界值 9.488)→ <strong>拒絕 H₀,喜好因類別而異</strong>,仍有 .05 機率犯型 I 錯誤。</li>
+<li>加法性:兩個獨立卡方值相加,自由度也相加。</li>
+<li>成果驗收答案:公私立 × 社經地位(各格比例相同)→ <strong>無關</strong>;兩洗衣粉品牌(56:14 與 24:6 比例相同)→ <strong>品牌與洗淨程度無關,廣告不宜宣稱 X 較好</strong>;健美先生(30、15、15,期望各 20)→ χ² = 7.5 &gt; 5.991 → <strong>三種意見人數有顯著差異</strong>。</li>
+</ul>
+<hr />
+<h2 id="s21">速查:該用哪個分配/方法?</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>我要…</th>
+<th>用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>估計/檢定平均數,σ 已知或大樣本</td>
+<td><strong>Z</strong></td>
+</tr>
+<tr>
+<td>估計/檢定平均數,σ 未知、小樣本</td>
+<td><strong>t</strong>(df = n−1)</td>
+</tr>
+<tr>
+<td>比兩組平均數,獨立小樣本</td>
+<td><strong>t</strong>(先判斷變異數是否同質)</td>
+</tr>
+<tr>
+<td>比前後測(同一批人)</td>
+<td>相依樣本 <strong>t</strong></td>
+</tr>
+<tr>
+<td>估計單一變異數</td>
+<td><strong>χ²</strong></td>
+</tr>
+<tr>
+<td>比兩個變異數是否相等</td>
+<td><strong>F</strong></td>
+</tr>
+<tr>
+<td>估計比例/百分比</td>
+<td><strong>Z</strong>(n·p、n·q &gt; 5)</td>
+</tr>
+<tr>
+<td>兩個連續變數的關係</td>
+<td>皮爾遜 <strong>r</strong>(df = N−2 做 t 檢定)</td>
+</tr>
+<tr>
+<td>一個連續、一個二分</td>
+<td><strong>點二系列 r_pb</strong></td>
+</tr>
+<tr>
+<td>用 X 預測 Y</td>
+<td>直線迴歸;多個 X → 多元/逐步迴歸</td>
+</tr>
+<tr>
+<td>類別資料的次數比較</td>
+<td><strong>卡方</strong>(適合度/同質性/獨立性/改變)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="s22">常考觀念陷阱(來自成果驗收題)</h2>
+<ol>
+<li>信賴區間越大 → 信心水準越高,但<strong>精確度越低</strong>。</li>
+<li>t 檢定要求母體常態;違反時補救是<strong>增加樣本數</strong>(中央極限定理)。</li>
+<li>中央極限定理前提<strong>不需要</strong>母體是常態。</li>
+<li>常態分配:平均 = 中位數 = 眾數;約 <strong>0.3%</strong> 在 ±3σ 之外,不是「±5σ 外有 1%」(那題的選項是錯的敘述)。</li>
+<li>相關係數看<strong>絕對值</strong>判斷強弱;<strong>不是斜率</strong>;<strong>不等於因果</strong>。</li>
+<li>R² = SSreg / SSt。</li>
+<li>虛擬變數個數 = 水準數 − 1。</li>
+<li>卡方的期望次數太小(&lt; 5)要合併或校正。</li>
+</ol>
+<hr />
+<h2 id="s23">資料不完整的地方(請注意)</h2>
+<ul>
+<li><strong>音訊轉文字可能有錯字</strong>(例:「標準誤」被寫成「標準物」、「變異數」被寫成「編譯數」),我已依上下文修正;數字與公式請以講義為準。</li>
+<li>講義裡的<strong>公式多半是圖片或物件</strong>,無法抽出,已標「📝補充」處是我補的標準寫法。</li>
+<li><strong>下載不完整的影片</strong>:次數分配製表步驟、次數分配圖示法(後半)、變異量數、一支課前準備影片。這些內容請直接看影片。</li>
+<li>各週開頭「課前準備」影片多為無旁白(畫面/音樂),語音辨識沒有內容。</li>
+<li>常態分配表、卡方臨界值表是圖片/空白,表本身沒有擷取。</li>
+<li>影片是否與正式教科書/期中期末考範圍完全一致,請以老師公告為準;iClass 上「測驗」時間為 2026/10/31(六)10:50–12:10,目前未開放。</li>
+</ul>
+<h2 id="s24">檔案位置(都在 <code>D:\Desktop\數碩網頁\</code>)</h2>
+<ul>
+<li><code>教材\</code>:講義 PPT/Word 與圖片原檔</li>
+<li><code>影片\</code>:課程影片</li>
+<li><code>逐字稿\</code>:每支影片的逐字稿(含時間戳)</li>
+<li><code>講義文字\</code>:講義抽出的純文字</li>
+</ul></div>
+    </section>
+
+    <section id="quiz" class="panel">
+      <div class="qhead">
+        <select id="chap" aria-label="選擇章節"></select>
+        <button id="shuf">隨機排序</button>
+        <button id="wrongonly">只練錯題</button>
+        <button id="reset" class="pri">重新開始</button>
+        <div class="score">已答 <b id="nAns">0</b> / <span id="nTot">0</span> ・ 答對 <b id="nOk">0</b></div>
+      </div>
+      <div class="prog"><i id="bar"></i></div>
+      <div id="qlist"></div>
+      <div class="done" id="done"></div>
+    </section>
+
+    <section id="calc" class="panel">
+      <div class="hero"><p>先自己算一遍,再點開看解答與過程。</p></div>
+      <div id="clist"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+const QUIZ = [{"c": "W2 四大變數與次數分配", "q": "「血型」「學號」「宗教」屬於哪一種測量尺度?", "o": ["次序變數", "名義變數", "等距變數", "比例變數"], "a": 1, "e": "只能用來分類、沒有大小順序,屬於名義變數。這類資料只有「次數」有意義(眾數可用)。"}, {"c": "W2 四大變數與次數分配", "q": "溫度(℃)屬於等距變數而不是比例變數,最主要的原因是?", "o": ["溫度不能排大小", "溫度沒有絕對零點", "溫度不是連續變數", "溫度不能做加減"], "a": 1, "e": "等距變數有「相等單位」可加減,但沒有絕對零點(0℃ 不代表沒有溫度),所以不能說 20℃ 是 10℃ 的兩倍。"}, {"c": "W2 四大變數與次數分配", "q": "下列哪一種變數「有絕對零點」,可以說「兩倍」「一半」?", "o": ["名義變數", "次序變數", "等距變數", "比例變數"], "a": 3, "e": "比例變數(身高、體重、年齡、薪資…)有絕對零點,可以做加減乘除。"}, {"c": "W2 四大變數與次數分配", "q": "次序變數(如名次、教育程度)不能做加減,主要因為?", "o": ["沒有名稱", "無法衡量等級之間距離差異的大小", "不能比較大小", "不是數字"], "a": 1, "e": "次序變數只知道順序,不知道「第一名和第二名差多少」,差距不相等,所以不能做四則運算。"}, {"c": "W2 四大變數與次數分配", "q": "畫長條圖時長方形之間要分開,原因是?", "o": ["比較好看", "資料是類別資料,沒有連貫性", "資料是連續變數", "要表示累積次數"], "a": 1, "e": "長條圖用於類別(名義)資料,數據沒有連貫性所以要分開;直方圖用於連續變數,長方形才相連。"}, {"c": "W3 集中、變異與相對地位", "q": "成績 40,40,50,50,60,60,70,70,70,80,80,90(共 12 人)的中位數是?", "o": ["60", "65", "70", "63.3"], "a": 1, "e": "N=12 為偶數,取第 6、7 個數的平均:(60+70)÷2 = 65。63.3 是平均數,70 是眾數。"}, {"c": "W3 集中、變異與相對地位", "q": "同一組資料(上題 12 人)的平均數約為?", "o": ["60", "65", "63.3", "70"], "a": 2, "e": "總和 760 ÷ 12 ≈ 63.3。"}, {"c": "W3 集中、變異與相對地位", "q": "下列哪個集中量數「適用於所有測量尺度」?", "o": ["平均數", "中位數", "眾數", "四分位差"], "a": 2, "e": "眾數(出現次數最多的值)連名義變數都能用;平均數需等距以上,中位數需次序以上。"}, {"c": "W3 集中、變異與相對地位", "q": "七位同學年齡 18~24 歲,求四分位差。Q₁、Q₃ 的位置公式分別是?", "o": ["n/4、3n/4", "(n+1)/4、3(n+1)/4", "(n−1)/4、3(n−1)/4", "n/2、n"], "a": 1, "e": "Q₁位置 = (n+1)/4 = 2 → 19 歲;Q₃位置 = 3(n+1)/4 = 6 → 23 歲;QD = 23−19 = 4 歲。"}, {"c": "W3 集中、變異與相對地位", "q": "計算平均差時,要把各數據的離均差取「絕對值」再平均,原因是?", "o": ["讓數字變大", "離均差的總和恆為 0,不取絕對值就沒意義", "為了去除單位", "因為資料是次序變數"], "a": 1, "e": "離均差有正有負,總和一定是 0,所以必須取絕對值消除正負號後才能加總。"}, {"c": "W3 集中、變異與相對地位", "q": "關於標準差,下列何者正確?", "o": ["可以是負數", "單位與原始資料不同", "數值越大,資料越分散", "等於變異數"], "a": 2, "e": "標準差為非負數、單位與原資料相同,越大代表各值離平均越遠(越分散)。標準差 = 變異數開根號。"}, {"c": "W3 集中、變異與相對地位", "q": "Z 分數的公式是?", "o": ["(X − μ) × σ", "(X − μ) ÷ σ", "X ÷ σ", "(μ − σ) ÷ X"], "a": 1, "e": "Z = (原始分數 − 平均數) ÷ 標準差,表示分數離平均有幾個標準差。"}, {"c": "W3 集中、變異與相對地位", "q": "百分等級(PR)與標準分數(Z)的差異,下列何者正確?", "o": ["PR 是等距量尺,Z 是次序量尺", "PR 永遠為正,屬次序量尺;Z 可為負,屬等距量尺", "兩者都永遠為正", "兩者都是比例量尺"], "a": 1, "e": "百分等級是把團體分成 100 等分的次序量尺(永遠為正);標準分數以標準差為單位,是等距量尺,可以是負數。"}, {"c": "W4 二項與常態分配", "q": "投手好球機率 p=0.6,投 100 球,好球數的期望值與變異數為?", "o": ["60、24", "60、0.24", "40、24", "100、60"], "a": 0, "e": "二項分配 μ = np = 100×0.6 = 60;σ² = npq = 100×0.6×0.4 = 24。"}, {"c": "W4 二項與常態分配", "q": "常態分配中,平均數上下一個標準差之間約佔全體的?", "o": ["34%", "68%", "95%", "99.7%"], "a": 1, "e": "經驗法則:±1σ 約 68%、±2σ 約 95%、±3σ 約 99.7%。34% 是單邊(平均到 +1σ)。"}, {"c": "W4 二項與常態分配", "q": "在常態分配中,林小文的分數在平均以上一個標準差的位置,約是第幾百分位?", "o": ["第 50", "第 68", "第 84", "第 95"], "a": 2, "e": "平均以下 50% + 平均到 +1σ 的 34% ≈ 84%,所以約第 84 百分位。"}, {"c": "W4 二項與常態分配", "q": "μ=100、σ=20 的測驗,某生得 137 分,約有百分之幾的人不如他?", "o": ["約 87%", "約 92%", "約 97%", "約 99%"], "a": 2, "e": "Z = (137−100)/20 = 1.85;查表 0 到 1.85 之間面積 0.4678,加上左半邊 0.5 → 0.9678,約 97%。"}, {"c": "W4 二項與常態分配", "q": "資料呈「正偏態(右偏)」時,下列何者正確?", "o": ["平均數 < 中位數,高分的人較多", "平均數 > 中位數,低分的人較多,尾巴在右", "平均數 = 中位數", "偏態係數 g₁ < 0"], "a": 1, "e": "正偏態:g₁ > 0,分數集中在低分、尾巴拉向高分,所以平均數被拉高,大於中位數。"}, {"c": "W4 二項與常態分配", "q": "峰度係數 g₂ > 0 表示分配是?", "o": ["低闊峰(比常態平寬)", "常態峰", "高狹峰(比常態尖瘦)", "左偏分配"], "a": 2, "e": "g₂>0 高狹峰;g₂=0 常態峰;g₂<0 低闊峰。"}, {"c": "W4 二項與常態分配", "q": "T 分數的平均數與標準差分別是?", "o": ["0、1", "50、10", "100、15", "100、16"], "a": 1, "e": "T = 10Z + 50,平均 50、標準差 10。(100、15 是魏氏量表,100、16 是比西量表。)"}, {"c": "W4 二項與常態分配", "q": "甲在 A 考場得 80 分(該場平均 78、SD 4),他的 T 分數是?", "o": ["52", "55", "58", "60"], "a": 1, "e": "Z = (80−78)/4 = 0.5;T = 10×0.5 + 50 = 55。"}, {"c": "W5 機率與期望值", "q": "擲一顆公正骰子,事件 A=「出現奇數」{1,3,5} 屬於?", "o": ["簡單事件", "複合(複雜)事件", "不可能事件", "必然事件"], "a": 1, "e": "含有 2 個以上樣本點的事件是複合事件;只含 1 個樣本點才是簡單(基本)事件。"}, {"c": "W5 機率與期望值", "q": "四張牌(鬼牌、黑桃2、黑桃3、紅心2)抽一張,抽到「鬼牌或黑桃 2」的機率?", "o": ["1/4", "1/2", "3/4", "1"], "a": 1, "e": "鬼牌與黑桃 2 互斥,P(A∪B)=P(A)+P(B)=1/4+1/4=1/2。"}, {"c": "W5 機率與期望值", "q": "同樣四張牌,抽到「黑桃或 2」的機率是?(兩事件有共同的黑桃 2)", "o": ["1/2", "3/4", "1", "1/4"], "a": 1, "e": "非互斥:P(A∪B)=P(A)+P(B)−P(A∩B)=1/2+1/2−1/4=3/4。"}, {"c": "W5 機率與期望值", "q": "猜拳連續贏 3 次,每次獲勝機率 1/3,機率為?", "o": ["1/3", "1/9", "1/27", "1/6"], "a": 2, "e": "每次猜拳互相獨立,P=(1/3)×(1/3)×(1/3)=1/27。"}, {"c": "W5 機率與期望值", "q": "袋中 3 黑球 4 白球,不放回連抽兩球,兩球皆白的機率?", "o": ["16/49", "2/7", "3/7", "4/7"], "a": 1, "e": "相依事件:P=P(A)×P(B|A)=4/7 × 3/6 = 2/7。(16/49 是放回的情況。)"}, {"c": "W5 機率與期望值", "q": "袋中紅球 5 顆(得 10 元)、黃球 3 顆(得 100 元)、藍球 2 顆(得 200 元),抽一球的期望獎金?", "o": ["50 元", "75 元", "100 元", "310 元"], "a": 1, "e": "E(X)=ΣPᵢXᵢ = 0.5×10 + 0.3×100 + 0.2×200 = 5+30+40 = 75 元。"}, {"c": "W6 抽樣與中央極限定理", "q": "台北市從 12 個行政區隨機抽 6 區,再抽一條路普查所有住戶,這是哪種抽樣?", "o": ["簡單隨機抽樣", "分層抽樣", "集群抽樣", "系統抽樣"], "a": 2, "e": "以「集群(行政區、道路)」為單位抽樣,抽到的集群全部調查,屬集群(叢式)抽樣。"}, {"c": "W6 抽樣與中央極限定理", "q": "母體 N=5000,要抽 n=50 的系統抽樣,抽樣間隔 k 是多少?", "o": ["50", "100", "250", "5000"], "a": 1, "e": "k = N/n = 5000/50 = 100。起點在 1~100 隨機抽(如 30),之後每隔 100 抽一個:30、130、230…"}, {"c": "W6 抽樣與中央極限定理", "q": "分層抽樣和集群抽樣最大的不同是?", "o": ["分層是每一層都抽、集群是抽幾個集群全部調查", "分層不需要隨機", "集群一定比分層準確", "兩者完全相同"], "a": 0, "e": "分層:先分層,每層都隨機抽樣本;集群:抽出若干個集群,集群內的全部個體都調查。"}, {"c": "W6 抽樣與中央極限定理", "q": "關於中央極限定理,下列何者正確?", "o": ["母體必須是常態分配才適用", "n 夠大時,樣本平均數的分配趨近常態,不論母體形狀", "樣本越大,標準誤越大", "只適用於二項分配"], "a": 1, "e": "中央極限定理不要求母體常態;只要 n 夠大(一般 ≥ 30),樣本平均數的抽樣分配就趨近常態。"}, {"c": "W6 抽樣與中央極限定理", "q": "樣本平均數的標準差(標準誤)是?", "o": ["σ × √n", "σ ÷ √n", "σ ÷ n", "σ²"], "a": 1, "e": "標準誤 = σ/√n,樣本越大標準誤越小,估計越集中、越準。"}, {"c": "W6 抽樣與中央極限定理", "q": "分層抽樣若「分層不當」,結果會?", "o": ["一定更準確", "反而無法抽出代表母體的樣本", "變成普查", "等於系統抽樣"], "a": 1, "e": "分層抽樣要靠合理的分層(層內相似、層間差異大);分層不當,反而失去代表性。"}, {"c": "W7 抽樣分配與四大分配", "q": "同一顯著水準下,t 分配和 Z 分配相比,t 的臨界值?", "o": ["較小,較容易顯著", "較大,較難顯著", "一樣", "與自由度無關"], "a": 1, "e": "t 分配較扁平、尾巴較厚,所以臨界值比 Z 大,較難得到顯著;df 越大兩者越接近(n>30 幾乎相同)。"}, {"c": "W7 抽樣分配與四大分配", "q": "當自由度趨近無限大時,t 分配會變成?", "o": ["卡方分配", "F 分配", "標準常態分配", "二項分配"], "a": 2, "e": "常態分配其實是 t 分配的特例(df = ∞);實務上 df≈30 就很接近了。"}, {"c": "W7 抽樣分配與四大分配", "q": "F 分配的主要用途是?", "o": ["比較兩個母體變異數是否相等", "檢定單一平均數", "檢定相關係數", "描述二項試驗"], "a": 0, "e": "F 是兩個卡方(除以自由度)的比值,用來比較兩母體變異數;有分子、分母兩個自由度。"}, {"c": "W7 抽樣分配與四大分配", "q": "卡方分配的形狀特性?", "o": ["對稱、可為負", "右偏、值 ≥ 0,自由度越大越接近常態", "左偏、值 ≤ 0", "永遠是常態"], "a": 1, "e": "卡方是 Z 的平方和,所以 ≥ 0,為右偏分配;自由度增加逐漸對稱,趨近無限大時接近常態。"}, {"c": "W7 抽樣分配與四大分配", "q": "下列何者是「參數」而不是「統計量」?", "o": ["樣本平均數 X̄", "樣本標準差 s", "母體平均數 μ", "t 值"], "a": 2, "e": "參數描述母體(μ、σ);統計量描述樣本(X̄、s)。用 X̄ 去估計 μ。"}, {"c": "W8 估計(一)", "q": "「估計量的期望值等於母數」,這描述估計量的哪一項準則?", "o": ["有效性", "不偏性", "一致性", "充分性"], "a": 1, "e": "不偏性:E(θ̂)=θ。有效性是變異數最小;一致性是 n 越大越接近母數;充分性是用盡樣本訊息。"}, {"c": "W8 估計(一)", "q": "「虛無假設 H₀ 為真,卻拒絕了它」是哪一種錯誤?", "o": ["型 I 錯誤(α)", "型 II 錯誤(β)", "抽樣誤差", "非抽樣誤差"], "a": 0, "e": "型 I 錯誤 = α 風險(顯著水準);型 II 錯誤 = H₀ 為假卻沒拒絕。"}, {"c": "W8 估計(一)", "q": "其他條件不變,把信賴水準從 95% 提高到 99%,信賴區間會?", "o": ["變窄", "變寬", "不變", "位置平移但寬度不變"], "a": 1, "e": "1−α 越大,Z 臨界值越大,區間越寬;信心提高了,但精確度下降。"}, {"c": "W8 估計(一)", "q": "其他條件不變,樣本數 n 增加,信賴區間會?", "o": ["變寬", "變窄", "不變", "無法判斷"], "a": 1, "e": "n 大 → 標準誤小 → 區間變短(更精準)。"}, {"c": "W8 估計(一)", "q": "某班 50 位學童的「期中考」與「期末考」成績比較,是哪種樣本?", "o": ["獨立樣本", "相依樣本", "隨機樣本", "分層樣本"], "a": 1, "e": "同一批受試者前後測,兩次反應相關,屬相依樣本(重複量數)。男女生智商比較才是獨立樣本。"}, {"c": "W8 估計(一)", "q": "估計「母體變異數」的信賴區間,為什麼不能用「樣本統計量 ± 誤差」的方式?", "o": ["因為變異數不能估計", "因為樣本變異數服從卡方分配,是不對稱的右偏分配", "因為要用 t 分配", "因為樣本太小"], "a": 1, "e": "卡方分配是右偏非對稱,區間上下界要分別用兩個卡方臨界值計算。"}, {"c": "W8 估計(一)", "q": "用 t 檢定比較兩個獨立樣本的平均數,需要哪三個基本假設?", "o": ["常態、變異數同質、獨立", "常態、樣本相等、相依", "等距、比例、次序", "大樣本、σ 已知、對稱"], "a": 0, "e": "①變異數同質性(σ₁²=σ₂²);②兩母群常態;③樣本內數值彼此獨立。"}, {"c": "W9 估計(二)", "q": "1000 人調查中 40% 贊成,95% 信賴區間約為?", "o": ["30%~50%", "37%~43%", "39%~41%", "35%~45%"], "a": 1, "e": "SE=√(0.4×0.6/1000)≈0.0155;1.96×0.0155≈0.03 → 37%~43%(抽樣誤差約 ±3 個百分點)。"}, {"c": "W9 估計(二)", "q": "要在 95% 信賴下把比例估計誤差控制在 ±3%,所需樣本大小約?", "o": ["約 100 人", "約 400 人", "約 1067 人", "約 9600 人"], "a": 2, "e": "n = Z²·p(1−p)/e² = 1.96²×0.25/0.03² ≈ 1067。"}, {"c": "W9 估計(二)", "q": "母體比例 p 未知,求樣本數時為什麼取 p=0.5?", "o": ["因為 p 一定是 0.5", "因為 p(1−p) 在 p=0.5 時最大,最保守", "因為 0.5 是 Z 臨界值", "因為要用卡方"], "a": 1, "e": "p(1−p) 最大值為 1/4,代入可保證 n 至少達到要求的精確度。"}, {"c": "W9 估計(二)", "q": "用 Z 做百分比區間估計時,需要哪些條件?", "o": ["n·p̂ 與 n(1−p̂) 都大於 5(且大樣本)", "n 必須小於 30", "p̂ 必須是 0.5", "母體必須是常態"], "a": 0, "e": "大樣本(n≥30)且 n·p̂、n·(1−p̂) 皆 > 5 時,二項分配才近似常態。"}, {"c": "W10 相關", "q": "r = +0.85 與 r = −0.85 相比?", "o": ["正相關的關係比較密切", "負相關的關係比較密切", "同樣密切,只是方向不同", "無法比較"], "a": 2, "e": "強度看絕對值,正負只代表方向;不能說正相關大於負相關。"}, {"c": "W10 相關", "q": "對積差相關係數 r 做 t 檢定,自由度為?", "o": ["N", "N−1", "N−2", "N−3"], "a": 2, "e": "df = N−2,因為兩個變項各用掉一個自由度。H₀:ρ=0。"}, {"c": "W10 相關", "q": "相關係數 r 代表的是散佈圖中的什麼?", "o": ["直線的斜率", "各點貼近直線的緊密程度", "截距", "平均數"], "a": 1, "e": "r 反映各點在直線兩旁的緊密程度,不是斜率;完全相關時點全在同一直線上。"}, {"c": "W10 相關", "q": "共變數除以兩個變項標準差的乘積等於?", "o": ["變異數", "相關係數 r", "迴歸斜率", "標準誤"], "a": 1, "e": "r = Cov(X,Y)/(SDx·SDy)。共變數為正/負/0,r 也一定為正/負/0。"}, {"c": "W10 相關", "q": "一個變項是二分(男/女)、另一個是連續分數,最適合的相關係數是?", "o": ["皮爾遜積差相關", "點二系列相關 r_pb", "卡方", "F 值"], "a": 1, "e": "二分變項對連續變項的相關用點二系列相關 r_pb;把二分變項編成 0/1 後,結果等於 Pearson r。"}, {"c": "W10 相關", "q": "下列關於「相關」的敘述,何者正確?", "o": ["相關高就代表有因果關係", "樣本很小時,即使 r 很高也可能只是機遇", "r=0 一定代表兩變項完全無關", "r 的單位和原變項相同"], "a": 1, "e": "相關不等於因果(可能有第三因素、可逆、間接);r=0 也可能是曲線相關;r 沒有單位;樣本很小時高 r 可能是機遇造成。"}, {"c": "W11–12 迴歸分析", "q": "做簡單直線迴歸預測前,應確認兩變項?", "o": ["沒有相關", "相關達顯著水準", "都是名義變項", "樣本數為偶數"], "a": 1, "e": "兩變項必須有顯著相關,預測才有意義;無關聯的兩變項無法預測。"}, {"c": "W11–12 迴歸分析", "q": "最小平方法(迴歸線)是要讓什麼最小?", "o": ["各點到直線的垂直距離平方和", "各點到平均數的距離", "斜率", "截距"], "a": 0, "e": "找一條使各點到直線「垂直於橫軸的距離」平方和(SSres)最小的最適合線。"}, {"c": "W11–12 迴歸分析", "q": "下列何者不是直線迴歸的基本假設?", "o": ["等分散性(變異數同質)", "依變項為常態分配", "預測關係是直線", "預測變項 X 必須是比例變項且服從卡方分配"], "a": 3, "e": "四個假設:等分散性、依變項常態、關係為直線、不同 X 下的 Y 獨立。並沒有「X 要服從卡方分配」。"}, {"c": "W11–12 迴歸分析", "q": "關於變異的拆解,下列何者正確?", "o": ["SSt = SSreg − SSres", "SSt = SSreg + SSres,R² = SSreg / SSt", "R² = SSres / SSt", "SSreg = SSt + SSres"], "a": 1, "e": "總變異 = 被迴歸解釋的 + 殘差。R² = SSreg/SSt,代表預測變項解釋了多少比例的變異。"}, {"c": "W11–12 迴歸分析", "q": "把「地理位置」(北、中、南、東 4 個水準)投入 SPSS 迴歸,需要幾個虛擬變數?", "o": ["1 個", "2 個", "3 個", "4 個"], "a": 2, "e": "虛擬變數個數 = 水準數 − 1 = 3(東部 = 0,0,0 為參照組)。"}, {"c": "W11–12 迴歸分析", "q": "原始迴歸公式 Ŷ=0.391X₁+1.061X₂−2.140 中,可以因為 1.061>0.391 就說 X₂ 比 X₁ 重要嗎?", "o": ["可以", "不可以,因為單位不同,要比較標準化迴歸係數 β", "可以,只要 R² 夠大", "不可以,因為截距是負的"], "a": 1, "e": "原始係數受單位影響,不能直接比大小;要看標準化(Z 分數)迴歸係數 β(此例 β₁=.286、β₂=.597)。"}, {"c": "W11–12 迴歸分析", "q": "上題公式中,某生 X₁=14、X₂=9,預測的 Ŷ 約為?", "o": ["10.50", "12.88", "15.02", "17.17"], "a": 1, "e": "0.391×14 + 1.061×9 − 2.140 = 5.474 + 9.549 − 2.140 ≈ 12.88。"}, {"c": "W11–12 迴歸分析", "q": "「逐步迴歸」與單純「順向選擇」最大的不同是?", "o": ["不需要相關係數", "已進入模式的變項後續仍會被重新檢驗,不顯著時可被剔除", "一次投入所有變項", "只能用一個預測變項"], "a": 1, "e": "逐步迴歸是順向選擇的改良:每步只進一個,但已進入的變項會被重新評估,可能被排除。SPSS 預設進入 p≤.05、移除 p≥.10。"}, {"c": "W13 卡方考驗", "q": "卡方考驗主要適用於哪一種資料?", "o": ["連續資料(等距、比例)", "類別資料(名義、次序)的次數", "相關係數", "平均數差異"], "a": 1, "e": "卡方用於人數/次數等類別資料:比較觀察次數與期望次數。"}, {"c": "W13 卡方考驗", "q": "適合度考驗(有 k 個類別)的自由度是?", "o": ["k", "k−1", "k−2", "(k−1)(k−1)"], "a": 1, "e": "適合度 df = k−1;列聯表(獨立性、同質性)df = (I−1)(J−1)。"}, {"c": "W13 卡方考驗", "q": "2×3 列聯表(2 列、3 行)的卡方檢定,自由度是?", "o": ["1", "2", "3", "6"], "a": 1, "e": "df = (2−1)(3−1) = 2。(例:5% 臨界值為 5.991。)"}, {"c": "W13 卡方考驗", "q": "使用卡方考驗時,各格期望次數最好?", "o": ["小於 1", "不少於 5(至少 80% 的格子 ≥ 5)", "剛好等於觀察次數", "不用限制"], "a": 1, "e": "期望次數太小(< 5)會影響結果,必要時把格子合併。"}, {"c": "W13 卡方考驗", "q": "100 人調查洗衣粉:X 牌 70 人(56 人說易洗淨、14 人說不易)、Y 牌 30 人(24 人說易洗淨、6 人說不易)。品牌與洗淨程度有關嗎?", "o": ["有關,X 牌較好", "無關(兩牌「易洗淨」比例同為 80%)", "有關,Y 牌較好", "無法判斷,需查表"], "a": 1, "e": "兩牌認為易洗淨的比例都是 80%,觀察 = 期望,χ²=0,所以品牌與洗淨程度無關,廣告不能宣稱 X 較好。"}, {"c": "W13 卡方考驗", "q": "「百分比同質性考驗」與「獨立性考驗」最主要的差別是?", "o": ["同質性事先固定各群(邊際)人數,獨立性只固定總人數", "同質性用 t,獨立性用 F", "同質性不用列聯表", "兩者完全沒有差別"], "a": 0, "e": "兩者都用列聯表與卡方;同質性有「設計變項」(群體人數事先固定);獨立性兩個變項都是反應變項,只固定總人數。"}, {"c": "W13 卡方考驗", "q": "健美先生意見調查 60 人:同意 30、反對 15、無意見 15。三種意見期望各 20,χ²=?是否顯著(df=2,臨界值 5.991)?", "o": ["χ²=2.5,不顯著", "χ²=7.5,顯著", "χ²=7.5,不顯著", "χ²=15,不顯著"], "a": 1, "e": "χ² = (30−20)²/20 + (15−20)²/20 + (15−20)²/20 = 5 + 1.25 + 1.25 = 7.5 > 5.991 → 達顯著,三種意見人數有顯著差異。"}, {"c": "W13 卡方考驗", "q": "「改變的顯著性考驗」(如前後測是否喜歡美術課)檢定的是?", "o": ["所有受試者的態度", "只看「有改變的人」:喜歡→不喜歡 與 不喜歡→喜歡 的人數是否相等(H₀:A=D)", "前後平均數的差", "兩變項的相關"], "a": 1, "e": "前後都喜歡或都不喜歡的人不列入;只比較兩種「改變方向」的人數是否有差異。"}];
+const CALC = [{"c": "W3", "q": "某班 7 位同學年齡為 18、19、20、21、22、23、24 歲,求四分位差。", "a": "n=7 → Q₁位置 = (7+1)/4 = 2 → 19;Q₃位置 = 3×8/4 = 6 → 23。<br><b>QD = 23 − 19 = 4 歲</b>(中間 50% 的人集中在 19~23 歲)。"}, {"c": "W4", "q": "A 考場平均 78、SD 4,甲得 80 分;B 考場平均 87、SD 9,乙得 90 分。比較甲、乙的 T 分數。", "a": "甲:Z=(80−78)/4=0.5 → T=50+10×0.5 = <b>55</b><br>乙:Z=(90−87)/9≈0.333 → T=50+10×0.333 ≈ <b>53.3</b><br>甲的相對表現較好。"}, {"c": "W4", "q": "μ=100、σ=20 的標準化測驗,某生 137 分,求 Z 與約有多少百分比的人不如他。", "a": "Z = (137−100)/20 = <b>1.85</b>;查表 0~1.85 面積 .4678 → .5000 + .4678 = .9678。<br>約 <b>97%</b> 的人不如他。"}, {"c": "W5", "q": "袋中紅球 5(得 10 元)、黃球 3(得 100 元)、藍球 2(得 200 元)。求抽一次的期望獎金。", "a": "E(X)=ΣPᵢXᵢ = (5/10)(10) + (3/10)(100) + (2/10)(200) = 5 + 30 + 40 = <b>75 元</b>。"}, {"c": "W5", "q": "袋中 3 黑球、4 白球,不放回連抽兩次,求兩次都抽到白球的機率。", "a": "相依事件:P(A∩B)=P(A)×P(B|A) = 4/7 × 3/6 = 12/42 = <b>2/7</b>。"}, {"c": "W8", "q": "σ 已知為 15,抽 100 位大四生得平均智商 110,求母體平均智商的 95% 信賴區間。", "a": "SE = 15/√100 = 1.5;Z₀.₀₂₅ = 1.96;誤差 = 1.96×1.5 = 2.94。<br>區間 = 110 ± 2.94 = <b>107.06 ~ 112.94</b>。"}, {"c": "W8", "q": "畢業生薪資 σ=2000,隨機抽 25 位得平均 19,500 元,求 95% 信賴區間。", "a": "SE = 2000/√25 = 400;誤差 = 1.96×400 = 784。<br>區間 = 19,500 ± 784 = <b>18,716 ~ 20,284</b>。"}, {"c": "W8", "q": "20 個容器的樣本,s²=0.0025,df=19。母體變異數 95% 信賴區間大約為?(提示:χ²₀.₉₇₅(19)=32.85、χ²₀.₀₂₅(19)=8.907)", "a": "下界 = (n−1)s²/χ²(上) = 19×0.0025/32.85 ≈ 0.0014;上界 = 19×0.0025/8.907 ≈ 0.0053。<br><b>0.0014 < σ² < 0.0053</b>。"}, {"c": "W9", "q": "電話訪問 1000 人,40% 贊成離島設賭場,求 95% 信賴區間。", "a": "SE = √(0.4×0.6/1000) ≈ 0.0155;誤差 = 1.96×0.0155 ≈ 0.03。<br>區間 = <b>37% ~ 43%</b>(抽樣誤差約 ±3 個百分點)。"}, {"c": "W9", "q": "要在 95% 信賴水準下,使比例估計的誤差不超過 ±3%,最少需要多少樣本?(p 未知)", "a": "取 p=0.5:n = Z²·p(1−p)/e² = (1.96²×0.25)/0.03² = 0.9604/0.0009 ≈ <b>1067</b> 人。"}, {"c": "W12", "q": "已知 R_y1=.643、R_y2=.768、r₁₂=.598 時,標準化係數 β₁=.286、β₂=.597。哪個預測變項較重要?R²=.6424 代表什麼?", "a": "β₂(.597)> β₁(.286),所以第二個預測變項(智力測驗)比第一個(高中學業成績)重要。<br>R² = .6424 → 兩個預測變項可解釋<b>大學入學考成績總變異的 64.24%</b>(多元相關 R = .8015)。"}, {"c": "W12", "q": "迴歸分析摘要表 SSres=33.4711、df=7,預測值 Ŷ=12.88,t(7)臨界值 2.365。求預測值的 95% 區間。", "a": "MSres = 33.4711/7 = 4.7816;估計標準誤 = √4.7816 ≈ 2.187。<br>誤差 = 2.365×2.187 ≈ 5.17 → 區間 ≈ <b>7.7 ~ 18.1</b>。"}, {"c": "W13", "q": "200 位學生選喜愛的課外讀物:財經 55、電腦 25、小說 30、科學 50、傳記 40。檢定喜好是否因類別而不同(α=.05,df=4 臨界值 9.488)。", "a": "H₀:各類別人數相同,E = 200/5 = 40。<br>χ² = [(55−40)² + (25−40)² + (30−40)² + (50−40)² + (40−40)²]/40 = (225+225+100+100+0)/40 = <b>16.25</b> > 9.488<br>→ 拒絕 H₀,喜好<b>因類別而有差異</b>。"}, {"c": "W13", "q": "高一(42 人)、高二(46 人)、高三(37 人)是否讀過武俠小說,共 125 人中 89 人「有」。若三個年級比例相同,各年級「有」的期望人數是?", "a": "整體比例 = 89/125 = 0.712。<br>高一 42×0.712 ≈ <b>29.9</b>、高二 46×0.712 ≈ <b>32.8</b>、高三 37×0.712 ≈ <b>26.3</b>。<br>df=(2−1)(3−1)=2,臨界值 5.991;課程算出 χ²=1.51 < 5.991 → 不拒絕 H₀。"}];
+const CHAPTERS = ["W2 四大變數與次數分配", "W3 集中、變異與相對地位", "W4 二項與常態分配", "W5 機率與期望值", "W6 抽樣與中央極限定理", "W7 抽樣分配與四大分配", "W8 估計(一)", "W9 估計(二)", "W10 相關", "W11–12 迴歸分析", "W13 卡方考驗"];
+
+/* 安全的 localStorage */
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v==null? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+/* 主題 */
+const root = document.documentElement;
+const savedTheme = store.get('edustat-theme', null);
+if(savedTheme) root.setAttribute('data-theme', savedTheme);
+document.getElementById('theme').onclick = () => {
+  const dark = getComputedStyle(root).getPropertyValue('--bg').trim() === '#12151c';
+  const next = dark ? 'light' : 'dark';
+  root.setAttribute('data-theme', next); store.set('edustat-theme', next);
+};
+
+/* 分頁 */
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('show', p.id===id));
+  document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.p===id));
+  document.getElementById('side').style.display = (id==='notes' && window.innerWidth>860) ? '' : 'none';
+  if(location.hash !== '#'+id && !location.hash.startsWith('#s')) history.replaceState(null,'','#'+id);
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => showPanel(t.dataset.p));
+window.addEventListener('resize', () => {
+  const on = document.getElementById('notes').classList.contains('show');
+  document.getElementById('side').style.display = (on && window.innerWidth>860) ? '' : 'none';
+});
+
+/* 目錄高亮 */
+const links = [...document.querySelectorAll('#side a')];
+const heads = links.map(a => document.getElementById(a.dataset.t));
+const io = new IntersectionObserver(es => {
+  es.forEach(e => { if(e.isIntersecting){
+    links.forEach(l => l.classList.toggle('on', l.dataset.t===e.target.id));
+    const cur = links.find(l => l.dataset.t===e.target.id); if(cur) cur.scrollIntoView({block:'nearest'});
+  }});
+}, {rootMargin:'-80px 0px -75% 0px'});
+heads.forEach(h => h && io.observe(h));
+
+/* ===== 選擇題 ===== */
+let order = [];      // 目前題目序列(QUIZ 的 index)
+let answered = {};   // idx -> 選的選項
+const wrongSet = new Set(store.get('edustat-wrong', []));
+const chapSel = document.getElementById('chap');
+chapSel.innerHTML = '<option value="all">全部章節(' + QUIZ.length + ' 題)</option>' +
+  CHAPTERS.map(c => `<option value="${c}">${c}(${QUIZ.filter(q=>q.c===c).length} 題)</option>`).join('');
+
+function build(shuffle, onlyWrong){
+  let idx = QUIZ.map((_, i) => i).filter(i => chapSel.value==='all' || QUIZ[i].c===chapSel.value);
+  if(onlyWrong) idx = idx.filter(i => wrongSet.has(i));
+  if(shuffle) idx.sort(() => Math.random()-0.5);
+  order = idx; answered = {};
+  render();
+}
+function render(){
+  const list = document.getElementById('qlist');
+  list.innerHTML = '';
+  document.getElementById('done').classList.remove('show');
+  if(!order.length){
+    list.innerHTML = '<div class="q">這個範圍目前沒有題目(也許還沒有答錯的題目,太棒了!)。</div>';
+  }
+  order.forEach((qi, n) => {
+    const Q = QUIZ[qi];
+    const card = document.createElement('div'); card.className = 'q'; card.id = 'q'+qi;
+    card.innerHTML = `<div class="tag">${n+1}. ${Q.c}</div><h4>${Q.q}</h4>` +
+      Q.o.map((o, k) => `<button class="opt" data-k="${k}">${'ABCD'[k]}. ${o}</button>`).join('') +
+      `<div class="exp"></div>`;
+    card.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(qi, +b.dataset.k, card));
+    list.appendChild(card);
+  });
+  stats();
+}
+function choose(qi, k, card){
+  if(qi in answered) return;
+  const Q = QUIZ[qi]; answered[qi] = k;
+  const opts = card.querySelectorAll('.opt');
+  opts.forEach(b => { b.disabled = true; });
+  opts[Q.a].classList.add('right');
+  const ok = k === Q.a;
+  if(!ok){ opts[k].classList.add('wrong'); wrongSet.add(qi); } else { wrongSet.delete(qi); }
+  store.set('edustat-wrong', [...wrongSet]);
+  const ex = card.querySelector('.exp');
+  ex.innerHTML = (ok ? '<b class="r">答對了!</b> ' : `<b class="w">答錯了,正確答案是 ${'ABCD'[Q.a]}。</b> `) + Q.e;
+  ex.classList.add('show');
+  stats();
+}
+function stats(){
+  const total = order.length, done = Object.keys(answered).length;
+  const ok = Object.entries(answered).filter(([qi, k]) => QUIZ[qi].a === k).length;
+  document.getElementById('nAns').textContent = done;
+  document.getElementById('nTot').textContent = total;
+  document.getElementById('nOk').textContent = ok;
+  document.getElementById('bar').style.width = total ? (done/total*100)+'%' : '0';
+  if(total && done===total){
+    const pct = Math.round(ok/total*100);
+    const d = document.getElementById('done');
+    d.innerHTML = `<div class="big">${ok} / ${total}</div><p>正確率 ${pct}%。${pct>=90?'非常穩!':pct>=70?'不錯,再看看錯的題目。':'建議回到「重點整理」複習後再試。'}</p>` +
+      `<p>目前累積答錯題數:${wrongSet.size}(可按「只練錯題」)</p>`;
+    d.classList.add('show');
+  }
+}
+chapSel.onchange = () => build(false, false);
+document.getElementById('shuf').onclick = () => build(true, false);
+document.getElementById('wrongonly').onclick = () => build(false, true);
+document.getElementById('reset').onclick = () => { wrongSet.clear(); store.set('edustat-wrong', []); build(false, false); };
+build(false, false);
+
+/* ===== 計算題 ===== */
+document.getElementById('clist').innerHTML = CALC.map((c, i) =>
+  `<details class="calc"><summary><span>${c.c}</span>${i+1}. ${c.q}</summary><div class="ans">${c.a}</div></details>`).join('');
+
+/* 以網址 hash 開啟分頁 */
+const h = location.hash.slice(1);
+if(h==='quiz' || h==='calc') showPanel(h);
+</script>
+</body>
+</html>
